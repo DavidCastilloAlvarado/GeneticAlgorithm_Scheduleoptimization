@@ -6,6 +6,7 @@ import random
 import matplotlib as plt
 import cv2
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 """
 iDIOmAS = [ing , spa , .... ARB]   10
 IDIONA XYZ= {  A ,  B}              2
@@ -13,13 +14,10 @@ SECCION_XYZ= {19-21, 21-23}         2
 CROMOSOMA = GEN1 | GEN2 ....  |GEN40 = bits >> 160
 
 GEN = [1,2,3,4] IDOMA XYZ A1 A2 B1 B2
-
 DIAS [ l - s]         6
 horas [19-21, 21-23]  2   
 
 12cajas = [0,1,2,3,...11] _ _ _ _
-
-
 """
 # %%
 def crear_poblacion(cant_poblacion, cant_horas,cant_dias,cant_idiomas,cant_secc,cant_sesiones):
@@ -192,8 +190,13 @@ def stop_criterio(poblacion, fitness_eval_result,threshold_val,memoria_best_eval
         print("Criterio de valor óptimo menor a {}".format(threshold_val))
         return True
 
-def print_eval_result():
-    return 0
+def print_eval_result(memoria_best_eval):
+    temp_df = pd.DataFrame(memoria_best_eval)
+    fig, ax = plt.subplots(figsize=(15,10))
+    ff =temp_df.plot(kind='line',ax=ax)
+    ff.set_title('Best Fitness by Iteration', size= 28 ) 
+    ff.set_xlabel('Iteration',size= 20 )
+    ff.set_ylabel('Fitness Evaluation',size= 20 )
 
 def print_producto(poblacion, fitness_eval_result,cant_horas,cant_dias,cant_idiomas,cant_secc,cant_sesiones,cant_bin_per_gen,HORARIOS):
     tabla = pd.DataFrame(np.zeros((cant_horas,cant_dias)))
@@ -259,6 +262,7 @@ if __name__ == "__main__":
         memoria_best_eval.append(actual_best)
         if stop_criterio(poblac_init, fitness_eval_result,threshold_val,memoria_best_eval, threshold_std_eval) or i_iterac == max_iteraciones-1:
             print_producto(poblac_init, fitness_eval_result,cant_horas,cant_dias,cant_idiomas,cant_secc,cant_sesiones,cant_bin_per_gen,HORARIOS)
+            print_eval_result(memoria_best_eval)
             break
         padres_i    = seleccion(poblac_init,fitness_eval_result,threshold_padres)
         crossover_i = crossover(padres_i,cant_bin_per_gen,cant_genes)
@@ -266,7 +270,5 @@ if __name__ == "__main__":
         poblac_init = mutacion_i.copy()
         last_best_eval = actual_best
     print(memoria_best_eval[-30:])
-    #deco_poblac =      eval_poblac_fitness(poblac_init,cant_horas,cant_dias,cant_idiomas,cant_secc,cant_sesiones,cant_bin_per_gen)
-    #print(np.reshape(deco_poblac, (cant_idiomas,-1,cant_sesiones)))
     pass
 # %%
